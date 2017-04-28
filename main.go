@@ -21,12 +21,13 @@ func main() {
 	router.HandleFunc("/getpic", GetPic)
 	router.HandleFunc("/getsong/{song}", GetSong)
 	router.HandleFunc("/getstyle", GetStyle)
+	router.HandleFunc("/getscript", GetScript)
 	//Listen and serve
 	log.Fatal(http.ListenAndServe(":8080", router))
 }
 
 func Index(w http.ResponseWriter, r *http.Request) {
-	http.ServeFile(w, r, "./index.html")
+	http.ServeFile(w, r, "./web/index.html")
 }
 func Songs(w http.ResponseWriter, r *http.Request) {
 	mysongs := SongsStruct{
@@ -55,5 +56,8 @@ func GetSong(w http.ResponseWriter, r *http.Request) {
 	http.ServeFile(w, r, "./music/"+song+".mp3")
 }
 func GetStyle(w http.ResponseWriter, r *http.Request){
-	http.ServeFile(w, r, "./style.css")
+	http.ServeFile(w, r, "./web/assets/css/style.css")
+}
+func GetScript(w http.ResponseWriter, r *http.Request){
+	http.ServeFile(w, r, "./web/assets/js/javascript.js")
 }
