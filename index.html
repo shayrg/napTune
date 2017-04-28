@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>NapTune</title>
+    <link rel="stylesheet" type="text/css" href="/getstyle"/>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
+    <script>
+        $(document).ready(function(){
+           loadSongs();
+        });
+        function loadSongs(){
+            $("#player").hide();
+            $("#player").on("ended",nextSong);
+            $.ajax({
+                url: "/songs",
+                type: "json",
+                success: function(data){
+                    $(data).each(function(i){
+                        var $div = $('<div>');
+                        var $p = $('<p>');
+                        var $a = $('<button>');
+                        //Button
+                        $a.click(changeSource);
+                        $a.text("Play");
+                        $a.attr("href", this.location);
+                        //Paragraph
+                        $p.text(this.name + ", " + this.length + " ");
+                        $p.append($a);
+                        //Div
+                        $div.append($p);
+                        //Playlist
+                        $("#playlist").append($div);
+                        if(i == 0){
+                            $a.click();
+                        }
+                    });
+                }
+            });
+        }
+        function changeSource() {
+            $("#player").attr("src", $(this).attr("href"));
+            $("#playing").attr("id","");
+            $(this).attr("id","playing");
+            //Play
+            playSong();
+            return false;
+        }
+        function playSong(){
+            $("#player").each(function(){
+                this.play();
+            });
+        }
+        function pauseSong(){
+            $("#player").each(function(){
+                this.pause();
+            });
+        }
+        function nextSong(){
+            $('#playing').parent().parent().next().children().children().click();
+        }
+    </script>
+</head>
+<body>
+    <h1>Hello</h1>
+
+    <button id="btnPlay" onclick="playSong()">Play</button>
+    <button id="btnPause" onclick="pauseSong()">Pause</button>
+
+    <audio id="player" controls></audio>
+
+    <div id="playlist">
+        <h3>Playlist:</h3>
+    </div>
+</body>
+</html>

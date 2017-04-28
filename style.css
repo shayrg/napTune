@@ -1,0 +1,10 @@
+#playlist{
+    margin-top: 50px;
+    border: 1px black solid;
+}
+#btnPlay{
+    background-color: green;
+}
+#btnPause{
+    background-color: red;
+}
