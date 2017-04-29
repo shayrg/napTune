@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"github.com/gorilla/mux"
 	"net/http"
 )
@@ -27,14 +26,8 @@ func Songs(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(mysongs)
 }
-func GetSongById(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	songId := vars["songId"]
-	mystring := "Your song id is " + songId
-	fmt.Fprintln(w, mystring)
-}
 func GetSong(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	song := vars["song"]
+	song := vars["songId"]
 	http.ServeFile(w, r, "./music/"+song+".mp3")
 }

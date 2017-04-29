@@ -16,8 +16,7 @@ func main() {
 	router.HandleFunc("/getscript", GetScript)
 	//Songs
 	router.HandleFunc("/songs", Songs)
-	router.HandleFunc("/songs/{songId}", GetSongById)
-	router.HandleFunc("/getsong/{song}", GetSong)
+	router.HandleFunc("/songs/{songId}", GetSong)
 	//Listen and serve
 	log.Fatal(http.ListenAndServe(":8080", router))
 }
