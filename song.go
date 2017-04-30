@@ -7,19 +7,28 @@ import (
 )
 
 type SongStruct struct {
+	Id       string `json:"id"`
 	Name     string `json:"name"`
+	Artist   string `json:"artist"`
 	Length   string `json:"length"`
 	Location string `json:"location"`
-	Order    string `json:"order"`
 }
 
 type SongsStruct []SongStruct
 
 func Songs(w http.ResponseWriter, r *http.Request) {
 	mysongs := SongsStruct{
-		SongStruct{Name: "Help", Length: "3 Min", Order: "2",
+		SongStruct{
+			Id:       "0001",
+			Name:     "Song Number One",
+			Artist:   "Steve",
+			Length:   "3 Min",
 			Location: "getsong/song2"},
-		SongStruct{Name: "Steve", Length: "2 Min", Order: "2",
+		SongStruct{
+			Id:       "0002",
+			Name:     "Song Number Two",
+			Artist:   "Steve",
+			Length:   "2 Min",
 			Location: "getsong/song1"},
 	}
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"github.com/gorilla/mux"
 	"log"
 	"net/http"
@@ -18,5 +19,8 @@ func main() {
 	router.HandleFunc("/songs", Songs)
 	router.HandleFunc("/songs/{songId}", GetSong)
 	//Listen and serve
-	log.Fatal(http.ListenAndServe(":8080", router))
+	test()
+	port := "8080"
+	fmt.Println("Listening on port: " + port)
+	log.Fatal(http.ListenAndServe(":"+port, router))
 }
