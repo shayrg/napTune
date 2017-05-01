@@ -69,42 +69,6 @@ func GetPlaylistSongsById(playlistId string) SongsObject {
 }
 
 //Helper functions
-func buildSongsObject(rows *sql.Rows) SongsObject {
-	var songs SongsObject
-	for rows.Next() {
-		var id string
-		var name string
-		var artist string
-		var length string
-		var location string
-		err := rows.Scan(&id, &name, &artist, &length, &location)
-		checkErr(err)
-		song := SongObject{
-			Id:       id,
-			Name:     name,
-			Artist:   artist,
-			Length:   length,
-			Location: location,
-		}
-		songs = append(songs, song)
-	}
-	return songs
-}
-func buildPlaylistsObject(rows *sql.Rows) PlayListsObject {
-	var playlists PlayListsObject
-	for rows.Next() {
-		var id string
-		var name string
-		err := rows.Scan(&id, &name)
-		checkErr(err)
-		playlist := PlayListObject{
-			Id:   id,
-			Name: name,
-		}
-		playlists = append(playlists, playlist)
-	}
-	return playlists
-}
 func checkErr(err error) {
 	if err != nil {
 		panic(err)

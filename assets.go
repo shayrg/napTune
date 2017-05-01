@@ -11,3 +11,6 @@ func GetStyle(w http.ResponseWriter, r *http.Request) {
 func GetScript(w http.ResponseWriter, r *http.Request) {
 	http.ServeFile(w, r, "./web/assets/js/javascript.js")
 }
+func Login(w http.ResponseWriter, r *http.Request) {
+	http.ServeFile(w, r, "./web/login.html")
+}

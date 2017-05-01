@@ -1,6 +1,7 @@
 package main
 
 import (
+	"database/sql"
 	"encoding/json"
 	"github.com/gorilla/mux"
 	"net/http"
@@ -15,12 +16,27 @@ type SongObject struct {
 }
 type SongsObject []SongObject
 
-type PlayListObject struct {
-	Id   string `json:"id"`
-	Name string `json:"name"`
+func buildSongsObject(rows *sql.Rows) SongsObject {
+	var songs SongsObject
+	for rows.Next() {
+		var id string
+		var name string
+		var artist string
+		var length string
+		var location string
+		err := rows.Scan(&id, &name, &artist, &length, &location)
+		checkErr(err)
+		song := SongObject{
+			Id:       id,
+			Name:     name,
+			Artist:   artist,
+			Length:   length,
+			Location: location,
+		}
+		songs = append(songs, song)
+	}
+	return songs
 }
-type PlayListsObject []PlayListObject
-
 func GetSongs(w http.ResponseWriter, _ *http.Request) {
 	songs := GetAllSongs()
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
@@ -40,25 +56,6 @@ func PlaySong(w http.ResponseWriter, r *http.Request) {
 	songId := vars["songId"]
 	http.ServeFile(w, r, "./web/assets/media/music/"+songId+".mp3")
 }
-func GetPlaylists(w http.ResponseWriter, _ *http.Request) {
-	playlists := GetAllPlaylists()
-	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(playlists)
-}
-func GetPlaylist(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	playlistId := vars["playlistId"]
-	playlist := GetPlaylistById(playlistId)
-	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(playlist)
-}
-func GetPlaylistSongs(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	playlistId := vars["playlistId"]
-	songs := GetPlaylistSongsById(playlistId)
-	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(songs)
+func UploadSong(w http.ResponseWriter, r *http.Request) {
+
 }
