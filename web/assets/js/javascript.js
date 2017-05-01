@@ -15,7 +15,7 @@ function loadSongs(){
                 //Button
                 $a.click(changeSource);
                 $a.text("Play");
-                $a.attr("href", this.location);
+                $a.attr("href", "songs/"+this.id+"/play");
                 //Paragraph
                 $p.text(this.name + ", " + this.length + " ");
                 $p.append($a);

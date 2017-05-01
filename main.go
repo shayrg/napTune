@@ -16,8 +16,9 @@ func main() {
 	router.HandleFunc("/getstyle", GetStyle)
 	router.HandleFunc("/getscript", GetScript)
 	//Songs
-	router.HandleFunc("/songs", Songs)
+	router.HandleFunc("/songs", GetSongs)
 	router.HandleFunc("/songs/{songId}", GetSong)
+	router.HandleFunc("/songs/{songId}/play", PlaySong)
 	//Listen and serve
 	port := "8080"
 	fmt.Println("Listening on port: " + port)
