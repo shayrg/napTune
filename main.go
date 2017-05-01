@@ -12,6 +12,12 @@ func main() {
 	router := mux.NewRouter().StrictSlash(true)
 	//Routs
 	//Assets
+	router.
+		Methods("POST").
+		Path("/login").
+		Name("submitLogin").
+		Handler(http.HandlerFunc(LoginSubmit))
+
 	router.HandleFunc("/", Index)
 	router.HandleFunc("/login", Login)
 	router.HandleFunc("/getstyle", GetStyle)
