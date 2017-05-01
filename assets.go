@@ -1,7 +1,7 @@
 package main
 
 import (
-	"fmt"
+	"encoding/json"
 	"net/http"
 )
 
@@ -24,6 +24,22 @@ func Login(w http.ResponseWriter, r *http.Request) {
 }
 func LoginSubmit(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
-	fmt.Println("username:", r.Form["email"])
-	fmt.Println("password:", r.Form["password"])
+	var email string = r.Form["email"][0]
+	var password string = r.Form["password"][0]
+	login := LoginObject{
+		Email:    email,
+		Password: password,
+	}
+	//Check Email exists
+	success := GetUserEmail(email)
+	if !success {
+		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+		w.WriteHeader(http.StatusPreconditionFailed)
+		json.NewEncoder(w).Encode(login)
+	}
+	//Check password
+
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(login)
 }

@@ -68,6 +68,14 @@ func GetPlaylistSongsById(playlistId string) SongsObject {
 	return songs
 }
 
+//User Table
+func GetUserEmail(email string) bool {
+
+}
+func GetUserInfo(info LoginObject) bool {
+
+}
+
 //Helper functions
 func checkErr(err error) {
 	if err != nil {
