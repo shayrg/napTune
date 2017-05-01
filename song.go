@@ -17,20 +17,7 @@ type SongStruct struct {
 type SongsStruct []SongStruct
 
 func Songs(w http.ResponseWriter, r *http.Request) {
-	mysongs := SongsStruct{
-		SongStruct{
-			Id:       "0001",
-			Name:     "Song Number One",
-			Artist:   "Steve",
-			Length:   "3 Min",
-			Location: "getsong/song2"},
-		SongStruct{
-			Id:       "0002",
-			Name:     "Song Number Two",
-			Artist:   "Steve",
-			Length:   "2 Min",
-			Location: "getsong/song1"},
-	}
+	mysongs := GetAllSongs()
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(mysongs)

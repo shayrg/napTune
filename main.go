@@ -19,7 +19,6 @@ func main() {
 	router.HandleFunc("/songs", Songs)
 	router.HandleFunc("/songs/{songId}", GetSong)
 	//Listen and serve
-	test()
 	port := "8080"
 	fmt.Println("Listening on port: " + port)
 	log.Fatal(http.ListenAndServe(":"+port, router))

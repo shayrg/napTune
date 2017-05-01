@@ -2,17 +2,16 @@ package main
 
 import (
 	"database/sql"
-	//"fmt"
-	"fmt"
 	_ "github.com/go-sql-driver/mysql"
 )
 
-func test() {
+func GetAllSongs() SongsStruct {
 	db, err := sql.Open("mysql", "root:@tcp(localhost:3306)"+
 		"/napTune?charset=utf8")
 	checkErr(err)
 	rows, err := db.Query("select * from songs")
 	checkErr(err)
+	var mysongs SongsStruct
 	for rows.Next() {
 		var id string
 		var name string
@@ -21,12 +20,16 @@ func test() {
 		var location string
 		err = rows.Scan(&id, &name, &artist, &length, &location)
 		checkErr(err)
-		fmt.Println(id)
-		fmt.Println(name)
-		fmt.Println(artist)
-		fmt.Println(length)
-		fmt.Println(location)
+		song := SongStruct{
+			Id:       id,
+			Name:     name,
+			Artist:   artist,
+			Length:   length,
+			Location: location,
+		}
+		mysongs = append(mysongs, song)
 	}
+	return mysongs
 }
 func checkErr(err error) {
 	if err != nil {
