@@ -1,13 +1,16 @@
 package main
 
 import (
+	"database/sql"
 	"encoding/json"
 	"net/http"
 )
 
-type LoginObject struct {
-	Email    string `json:"email"`
-	Password string `json:"password"`
+func userExists(rows sql.Rows) bool {
+	if rows.Next() {
+		return true
+	}
+	return false
 }
 
 func Index(w http.ResponseWriter, r *http.Request) {
@@ -26,7 +29,18 @@ func LoginSubmit(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
 	var email string = r.Form["email"][0]
 	var password string = r.Form["password"][0]
-	login := LoginObject{
+	var rows sql.Rows = GetUserEmail(email)
+	success := userExists(rows)
+	if success {
+		success = correctPassword(email, password)
+		if success {
+
+		}
+		//Fail
+	}
+	//Fail
+
+	/*login := LoginObject{
 		Email:    email,
 		Password: password,
 	}
@@ -36,10 +50,17 @@ func LoginSubmit(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 		w.WriteHeader(http.StatusPreconditionFailed)
 		json.NewEncoder(w).Encode(login)
-	}
-	//Check password
-
-	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(login)
+	} else {
+		//Check password
+		success = GetUserInfo(login)
+		if !success {
+			w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+			w.WriteHeader(http.StatusForbidden)
+			json.NewEncoder(w).Encode(login)
+		} else {
+			w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+			w.WriteHeader(http.StatusOK)
+			json.NewEncoder(w).Encode(login)
+		}
+	}*/
 }
