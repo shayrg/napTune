@@ -69,16 +69,16 @@ func GetPlaylistSongsById(playlistId string) SongsObject {
 }
 
 //User Table
-func GetUserEmail(email string) sql.Rows {
+func GetLogin(userLogin LoginObject) LoginObject {
 	db, err := sql.Open("mysql", dbString)
 	checkErr(err)
-	stmt, err := db.Prepare("select email, password from users where " +
-		"email = ?")
+	stmt, err := db.Prepare("select email, password from users where email = ?")
 	checkErr(err)
-	rows, err := stmt.Query(email)
+	rows, err := stmt.Query(userLogin.Email)
 	checkErr(err)
+	login := buildLogin(rows)
 	db.Close()
-	return rows
+	return login
 }
 
 //Helper functions
