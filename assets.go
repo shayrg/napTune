@@ -29,7 +29,6 @@ func buildLogin(rows *sql.Rows) LoginObject {
 	}
 	return login
 }
-
 func Index(w http.ResponseWriter, r *http.Request) {
 	http.ServeFile(w, r, "./web/index.html")
 }

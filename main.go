@@ -10,7 +10,6 @@ import (
 func main() {
 	//Make router
 	router := mux.NewRouter().StrictSlash(true)
-	//Routs
 	//Assets
 	router.
 		Methods("POST").
