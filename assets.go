@@ -30,7 +30,10 @@ func buildLogin(rows *sql.Rows) LoginObject {
 	return login
 }
 func Index(w http.ResponseWriter, r *http.Request) {
-	http.ServeFile(w, r, "./web/index.html")
+	//Check login cookie
+	//http.ServeFile(w, r, "./web/index.html")
+	//Else
+	Login(w, r)
 }
 func GetStyle(w http.ResponseWriter, r *http.Request) {
 	http.ServeFile(w, r, "./web/assets/css/style.css")
@@ -73,9 +76,15 @@ func LoginSubmit(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	//Return Response
-	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	w.WriteHeader(response.LoginStatus)
-	json.NewEncoder(w).Encode(response)
+	if response.LoginStatus == http.StatusOK {
+		//Set cookie
+		//Index()
+		http.ServeFile(w, r, "./web/index.html")
+	} else {
+		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+		w.WriteHeader(response.LoginStatus)
+		json.NewEncoder(w).Encode(response)
+	}
 }
 func userExists(dbLogin LoginObject) bool {
 	if dbLogin.Email != "" {
