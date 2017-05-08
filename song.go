@@ -16,6 +16,7 @@ type SongObject struct {
 }
 type SongsObject []SongObject
 
+//Functions
 func buildSongsObject(rows *sql.Rows) SongsObject {
 	var songs SongsObject
 	for rows.Next() {

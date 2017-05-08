@@ -29,25 +29,31 @@ func main() {
 	router.HandleFunc("/songs/{songId}", GetSong)
 	router.HandleFunc("/songs/{songId}/play", PlaySong)
 	//Playlist
+	//All playlists
 	router.Methods("POST").
 		Path("/playlists").
 		Name("CreatePlaylist").
 		Handler(http.HandlerFunc(CreatePlaylist))
-
-	router.Methods("POST").
-		Path("/playlists/{playlistId}").
-		Name("AddSongToPlaylist").
-		Handler(http.HandlerFunc(AddSongToPlaylist))
+	router.HandleFunc("/playlists", GetPlaylists)
+	//Playlist by id
 	router.Methods("PUT").
 		Path("/playlists/{playlistId}").
 		Name("EditPlaylist").
 		Handler(http.HandlerFunc(EditPlaylist))
 	router.Methods("DELETE").
 		Path("/playlists/{playlistId}").
-		Name("AddSongToPlaylist").
-		Handler(http.HandlerFunc(RemoveSongFromPlaylist))
-	router.HandleFunc("/playlists", GetPlaylists)
+		Name("DeletePlaylist").
+		Handler(http.HandlerFunc(DeletePlaylist))
 	router.HandleFunc("/playlists/{playlistId}", GetPlaylist)
+	//Songs by playlist
+	router.Methods("POST").
+		Path("/playlists/{playlistId}/songs").
+		Name("AddSongToPlaylist").
+		Handler(http.HandlerFunc(AddSongToPlaylist))
+	router.Methods("DELETE").
+		Path("/playlists/{playlistId}/songs").
+		Name("DeleteSongFromPlaylist").
+		Handler(http.HandlerFunc(RemoveSongFromPlaylist))
 	router.HandleFunc("/playlists/{playlistId}/songs", GetPlaylistSongs)
 	//Listen and serve
 	port := "8080"

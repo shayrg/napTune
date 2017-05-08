@@ -67,9 +67,6 @@ func CreatePlaylist(w http.ResponseWriter, _ *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(playlist)
 }
-func EditPlaylist(w http.ResponseWriter, r *http.Request) {
-
-}
 func AddSongToPlaylist(w http.ResponseWriter, r *http.Request) {
 	//Fake playlistSongObject
 	playlistSong := PlaylistSongObject{
@@ -83,5 +80,19 @@ func AddSongToPlaylist(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(playlistSong)
 }
 func RemoveSongFromPlaylist(w http.ResponseWriter, r *http.Request) {
+	//Fake playlistSongObject
+	playlistSong := PlaylistSongObject{
+		SongId: "0002",
+	}
+	vars := mux.Vars(r)
+	playlistSong.PlaylistId = vars["playlistId"]
+	DeleteSongInPlaylist(playlistSong)
+	//List Playlist songs
+	GetPlaylistSongs(w, r)
+}
+func EditPlaylist(w http.ResponseWriter, r *http.Request) {
+
+}
+func DeletePlaylist(w http.ResponseWriter, r *http.Request) {
 
 }

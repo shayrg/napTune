@@ -10,7 +10,8 @@ import (
 const dbString string = "root:@tcp(localhost:3306)" +
 	"/napTune?charset=utf8"
 
-//Songs table
+	//Songs table
+//Get
 func GetAllSongs() SongsObject {
 	db, err := sql.Open("mysql", dbString)
 	checkErr(err)
@@ -34,7 +35,7 @@ func GetSongById(songId string) SongsObject {
 	return songs
 }
 
-//Create Song
+//Insert
 func InsertSong(song SongObject) string {
 	song.Id = getNextId("songs")
 	db, err := sql.Open("mysql", dbString)
@@ -49,6 +50,7 @@ func InsertSong(song SongObject) string {
 }
 
 //Playlists table
+//Get
 func GetAllPlaylists() PlaylistsObject {
 	db, err := sql.Open("mysql", dbString)
 	checkErr(err)
@@ -84,7 +86,7 @@ func GetPlaylistSongsById(playlistId string) SongsObject {
 	return songs
 }
 
-//Insert playlist
+//Insert
 func InsertPlaylist(playlist PlaylistObject) string {
 	playlist.Id = getNextId("playlists")
 	db, err := sql.Open("mysql", dbString)
@@ -109,6 +111,19 @@ func InsertSongInPlaylist(playlistSong PlaylistSongObject) string {
 	return playlistSong.SongOrder
 }
 
+//Delete
+func DeleteSongInPlaylist(playlistSong PlaylistSongObject) {
+	db, err := sql.Open("mysql", dbString)
+	checkErr(err)
+	stmt, err := db.Prepare("delete from playlistSongs where " +
+		"playlistId = ? and songId = ?")
+	checkErr(err)
+	_, err = stmt.Exec(playlistSong.PlaylistId, playlistSong.SongId)
+	checkErr(err)
+	db.Close()
+}
+
+//Playlist
 //User Table
 func GetLogin(userLogin LoginObject) LoginObject {
 	db, err := sql.Open("mysql", dbString)
