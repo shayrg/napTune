@@ -2,7 +2,9 @@ package main
 
 import (
 	"database/sql"
+	"fmt"
 	_ "github.com/go-sql-driver/mysql"
+	"strconv"
 )
 
 const dbString string = "root:@tcp(localhost:3306)" +
@@ -30,6 +32,20 @@ func GetSongById(songId string) SongsObject {
 	songs := buildSongsObject(rows)
 	db.Close()
 	return songs
+}
+
+//Create Song
+func InsertSong(song SongObject) string {
+	song.Id = getNextSongId()
+	db, err := sql.Open("mysql", dbString)
+	checkErr(err)
+	stmt, err := db.Prepare("insert into songs values (?, ?, ?, ?, ?)")
+	checkErr(err)
+	_, err = stmt.Exec(song.Id, song.Name, song.Artist, song.Length,
+		song.Location)
+	checkErr(err)
+	db.Close()
+	return song.Id
 }
 
 //Playlists table
@@ -86,4 +102,21 @@ func checkErr(err error) {
 	if err != nil {
 		panic(err)
 	}
+}
+func getNextSongId() string {
+	db, err := sql.Open("mysql", dbString)
+	checkErr(err)
+	rows, err := db.Query("select id from songs order by id desc limit 1")
+	checkErr(err)
+	var id string
+	for rows.Next() {
+		var rowId string
+		rows.Scan(&rowId)
+		id = rowId
+	}
+	idInt, _ := strconv.ParseInt(id, 0, 64)
+	idInt++
+	id = fmt.Sprintf("%04d", idInt)
+	db.Close()
+	return id
 }

@@ -56,6 +56,16 @@ func PlaySong(w http.ResponseWriter, r *http.Request) {
 	songId := vars["songId"]
 	http.ServeFile(w, r, "./web/assets/media/music/"+songId+".mp3")
 }
-func UploadSong(w http.ResponseWriter, r *http.Request) {
-
+func UploadSong(w http.ResponseWriter, _ *http.Request) {
+	//Fake song
+	song := SongObject{
+		Name:     "hi",
+		Artist:   "Steve",
+		Length:   "2 min",
+		Location: "No location",
+	}
+	song.Id = InsertSong(song)
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(song)
 }

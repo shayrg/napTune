@@ -44,6 +44,9 @@ func GetScript(w http.ResponseWriter, r *http.Request) {
 func Login(w http.ResponseWriter, r *http.Request) {
 	http.ServeFile(w, r, "./web/login.html")
 }
+func LogoutSubmit(w http.ResponseWriter, r *http.Request) {
+
+}
 func LoginSubmit(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
 	var response LoginResponse
