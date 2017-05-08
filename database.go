@@ -10,8 +10,10 @@ import (
 const dbString string = "root:@tcp(localhost:3306)" +
 	"/napTune?charset=utf8"
 
-	//Songs table
-//Get
+/**
+ * Songs table
+ */
+//Get All
 func GetAllSongs() SongsObject {
 	db, err := sql.Open("mysql", dbString)
 	checkErr(err)
@@ -22,6 +24,8 @@ func GetAllSongs() SongsObject {
 	db.Close()
 	return songs
 }
+
+//Get
 func GetSongById(songId string) SongsObject {
 	db, err := sql.Open("mysql", dbString)
 	checkErr(err)
@@ -49,8 +53,10 @@ func InsertSong(song SongObject) string {
 	return song.Id
 }
 
-//Playlists table
-//Get
+/**
+ * Playlists table
+ */
+//Get All
 func GetAllPlaylists() PlaylistsObject {
 	db, err := sql.Open("mysql", dbString)
 	checkErr(err)
@@ -61,6 +67,8 @@ func GetAllPlaylists() PlaylistsObject {
 	db.Close()
 	return playlists
 }
+
+//Get
 func GetPlaylistById(playlistId string) PlaylistsObject {
 	db, err := sql.Open("mysql", dbString)
 	checkErr(err)
@@ -72,18 +80,6 @@ func GetPlaylistById(playlistId string) PlaylistsObject {
 	playlists := buildPlaylistsObject(rows)
 	db.Close()
 	return playlists
-}
-func GetPlaylistSongsById(playlistId string) SongsObject {
-	db, err := sql.Open("mysql", dbString)
-	checkErr(err)
-	stmt, err := db.Prepare("select songs.id, songs.name, artist, length, location from songs join playlistSongs on songs.id = songId join playlists on playlists.id = playlistId where playlistId = ?")
-	checkErr(err)
-	rows, err := stmt.Query(playlistId)
-	checkErr(err)
-	//Build Songs Object
-	songs := buildSongsObject(rows)
-	db.Close()
-	return songs
 }
 
 //Insert
@@ -98,6 +94,36 @@ func InsertPlaylist(playlist PlaylistObject) string {
 	db.Close()
 	return playlist.Id
 }
+
+//Delete
+func DeletePlaylist(playlist PlaylistObject) {
+	db, err := sql.Open("mysql", dbString)
+	checkErr(err)
+	stmt, err := db.Prepare("delete from playlists where id = ?")
+	checkErr(err)
+	_, err = stmt.Exec(playlist.Id)
+	checkErr(err)
+	db.Close()
+}
+
+/**
+ * PlaylistSongs Table
+ */
+//Get
+func GetPlaylistSongsById(playlistId string) SongsObject {
+	db, err := sql.Open("mysql", dbString)
+	checkErr(err)
+	stmt, err := db.Prepare("select songs.id, songs.name, artist, length, location from songs join playlistSongs on songs.id = songId join playlists on playlists.id = playlistId where playlistId = ?")
+	checkErr(err)
+	rows, err := stmt.Query(playlistId)
+	checkErr(err)
+	//Build Songs Object
+	songs := buildSongsObject(rows)
+	db.Close()
+	return songs
+}
+
+//Insert
 func InsertSongInPlaylist(playlistSong PlaylistSongObject) string {
 	playlistSong.SongOrder = getNextPlaylistOrder(playlistSong.PlaylistId)
 	db, err := sql.Open("mysql", dbString)
@@ -122,9 +148,21 @@ func DeleteSongInPlaylist(playlistSong PlaylistSongObject) {
 	checkErr(err)
 	db.Close()
 }
+func DeleteAllSongsInPlaylist(playlist PlaylistObject) {
+	db, err := sql.Open("mysql", dbString)
+	checkErr(err)
+	stmt, err := db.Prepare("delete from playlistSongs where " +
+		"playlistId = ?")
+	checkErr(err)
+	_, err = stmt.Exec(playlist.Id)
+	checkErr(err)
+	db.Close()
+}
 
-//Playlist
-//User Table
+/**
+ * User Table
+ */
+//Get
 func GetLogin(userLogin LoginObject) LoginObject {
 	db, err := sql.Open("mysql", dbString)
 	checkErr(err)
@@ -137,7 +175,9 @@ func GetLogin(userLogin LoginObject) LoginObject {
 	return login
 }
 
-//Helper functions
+/**
+ * Helper functions
+ */
 func checkErr(err error) {
 	if err != nil {
 		panic(err)

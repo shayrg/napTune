@@ -8,11 +8,6 @@ import (
 )
 
 //Types
-type PlaylistSongObject struct {
-	PlaylistId string
-	SongId     string
-	SongOrder  string
-}
 type PlaylistObject struct {
 	Id   string `json:"id"`
 	Name string `json:"name"`
@@ -49,14 +44,6 @@ func GetPlaylist(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(playlist)
 }
-func GetPlaylistSongs(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	playlistId := vars["playlistId"]
-	songs := GetPlaylistSongsById(playlistId)
-	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(songs)
-}
 func CreatePlaylist(w http.ResponseWriter, _ *http.Request) {
 	//Fake playlist
 	playlist := PlaylistObject{
@@ -67,32 +54,19 @@ func CreatePlaylist(w http.ResponseWriter, _ *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(playlist)
 }
-func AddSongToPlaylist(w http.ResponseWriter, r *http.Request) {
-	//Fake playlistSongObject
-	playlistSong := PlaylistSongObject{
-		SongId: "0002",
-	}
-	vars := mux.Vars(r)
-	playlistSong.PlaylistId = vars["playlistId"]
-	playlistSong.SongOrder = InsertSongInPlaylist(playlistSong)
-	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(playlistSong)
-}
-func RemoveSongFromPlaylist(w http.ResponseWriter, r *http.Request) {
-	//Fake playlistSongObject
-	playlistSong := PlaylistSongObject{
-		SongId: "0002",
-	}
-	vars := mux.Vars(r)
-	playlistSong.PlaylistId = vars["playlistId"]
-	DeleteSongInPlaylist(playlistSong)
-	//List Playlist songs
-	GetPlaylistSongs(w, r)
-}
+
 func EditPlaylist(w http.ResponseWriter, r *http.Request) {
 
 }
-func DeletePlaylist(w http.ResponseWriter, r *http.Request) {
-
+func RemovePlaylist(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	playlist := PlaylistObject{
+		Id: vars["playlistId"],
+	}
+	//Delete all songs from playlist
+	DeleteAllSongsInPlaylist(playlist)
+	//Delete playlist
+	DeletePlaylist(playlist)
+	//Show all playlists
+	GetPlaylists(w, r)
 }

@@ -43,7 +43,7 @@ func main() {
 	router.Methods("DELETE").
 		Path("/playlists/{playlistId}").
 		Name("DeletePlaylist").
-		Handler(http.HandlerFunc(DeletePlaylist))
+		Handler(http.HandlerFunc(RemovePlaylist))
 	router.HandleFunc("/playlists/{playlistId}", GetPlaylist)
 	//Songs by playlist
 	router.Methods("POST").
