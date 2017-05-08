@@ -49,7 +49,7 @@ func InsertSong(song SongObject) string {
 }
 
 //Playlists table
-func GetAllPlaylists() PlayListsObject {
+func GetAllPlaylists() PlaylistsObject {
 	db, err := sql.Open("mysql", dbString)
 	checkErr(err)
 	rows, err := db.Query("select * from playlists")
@@ -59,7 +59,7 @@ func GetAllPlaylists() PlayListsObject {
 	db.Close()
 	return playlists
 }
-func GetPlaylistById(playlistId string) PlayListsObject {
+func GetPlaylistById(playlistId string) PlaylistsObject {
 	db, err := sql.Open("mysql", dbString)
 	checkErr(err)
 	stmt, err := db.Prepare("select * from playlists where id = ?")
@@ -85,7 +85,7 @@ func GetPlaylistSongsById(playlistId string) SongsObject {
 }
 
 //Insert playlist
-func InsertPlaylist(playlist PlayListObject) string {
+func InsertPlaylist(playlist PlaylistObject) string {
 	playlist.Id = getNextId("playlists")
 	db, err := sql.Open("mysql", dbString)
 	checkErr(err)
@@ -95,6 +95,18 @@ func InsertPlaylist(playlist PlayListObject) string {
 	checkErr(err)
 	db.Close()
 	return playlist.Id
+}
+func InsertSongInPlaylist(playlistSong PlaylistSongObject) string {
+	playlistSong.SongOrder = getNextPlaylistOrder(playlistSong.PlaylistId)
+	db, err := sql.Open("mysql", dbString)
+	checkErr(err)
+	stmt, err := db.Prepare("insert into playlistSongs values (?, ?, ?)")
+	checkErr(err)
+	_, err = stmt.Exec(playlistSong.PlaylistId, playlistSong.SongId,
+		playlistSong.SongOrder)
+	checkErr(err)
+	db.Close()
+	return playlistSong.SongOrder
 }
 
 //User Table
@@ -128,9 +140,30 @@ func getNextId(table string) string {
 		rows.Scan(&rowId)
 		id = rowId
 	}
-	idInt, _ := strconv.ParseInt(id, 0, 64)
-	idInt++
-	id = fmt.Sprintf("%04d", idInt)
+	incrementString(&id)
 	db.Close()
 	return id
+}
+func getNextPlaylistOrder(playlistId string) string {
+	db, err := sql.Open("mysql", dbString)
+	checkErr(err)
+	stmt, err := db.Prepare("select songOrder from playlistSongs where " +
+		"playlistId = ? order by songOrder desc limit 1")
+	checkErr(err)
+	rows, err := stmt.Query(playlistId)
+	checkErr(err)
+	var songOrder string
+	for rows.Next() {
+		var rowSongOrder string
+		rows.Scan(&rowSongOrder)
+		songOrder = rowSongOrder
+	}
+	incrementString(&songOrder)
+	db.Close()
+	return songOrder
+}
+func incrementString(string *string) {
+	myInt, _ := strconv.ParseInt(*string, 0, 64)
+	myInt++
+	*string = fmt.Sprintf("%04d", myInt)
 }

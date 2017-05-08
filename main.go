@@ -11,8 +11,7 @@ func main() {
 	//Make router
 	router := mux.NewRouter().StrictSlash(true)
 	//Assets
-	router.
-		Methods("POST").
+	router.Methods("POST").
 		Path("/login").
 		Name("submitLogin").
 		Handler(http.HandlerFunc(LoginSubmit))
@@ -22,8 +21,7 @@ func main() {
 	router.HandleFunc("/getstyle", GetStyle)
 	router.HandleFunc("/getscript", GetScript)
 	//Songs
-	router.
-		Methods("POST").
+	router.Methods("POST").
 		Path("/songs").
 		Name("UploadSong").
 		Handler(http.HandlerFunc(UploadSong))
@@ -31,16 +29,23 @@ func main() {
 	router.HandleFunc("/songs/{songId}", GetSong)
 	router.HandleFunc("/songs/{songId}/play", PlaySong)
 	//Playlist
-	router.
-		Methods("POST").
+	router.Methods("POST").
 		Path("/playlists").
 		Name("CreatePlaylist").
 		Handler(http.HandlerFunc(CreatePlaylist))
-	router.
-		Methods("PUT").
+
+	router.Methods("POST").
+		Path("/playlists/{playlistId}").
+		Name("AddSongToPlaylist").
+		Handler(http.HandlerFunc(AddSongToPlaylist))
+	router.Methods("PUT").
 		Path("/playlists/{playlistId}").
 		Name("EditPlaylist").
 		Handler(http.HandlerFunc(EditPlaylist))
+	router.Methods("DELETE").
+		Path("/playlists/{playlistId}").
+		Name("AddSongToPlaylist").
+		Handler(http.HandlerFunc(RemoveSongFromPlaylist))
 	router.HandleFunc("/playlists", GetPlaylists)
 	router.HandleFunc("/playlists/{playlistId}", GetPlaylist)
 	router.HandleFunc("/playlists/{playlistId}/songs", GetPlaylistSongs)
