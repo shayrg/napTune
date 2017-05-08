@@ -50,8 +50,15 @@ func GetPlaylistSongs(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(songs)
 }
-func CreatePlaylist(w http.ResponseWriter, r *http.Request) {
-
+func CreatePlaylist(w http.ResponseWriter, _ *http.Request) {
+	//Fake playlist
+	playlist := PlayListObject{
+		Name: "New playlist",
+	}
+	playlist.Id = InsertPlaylist(playlist)
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(playlist)
 }
 func EditPlaylist(w http.ResponseWriter, r *http.Request) {
 

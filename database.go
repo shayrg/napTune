@@ -36,7 +36,7 @@ func GetSongById(songId string) SongsObject {
 
 //Create Song
 func InsertSong(song SongObject) string {
-	song.Id = getNextSongId()
+	song.Id = getNextId("songs")
 	db, err := sql.Open("mysql", dbString)
 	checkErr(err)
 	stmt, err := db.Prepare("insert into songs values (?, ?, ?, ?, ?)")
@@ -84,6 +84,19 @@ func GetPlaylistSongsById(playlistId string) SongsObject {
 	return songs
 }
 
+//Insert playlist
+func InsertPlaylist(playlist PlayListObject) string {
+	playlist.Id = getNextId("playlists")
+	db, err := sql.Open("mysql", dbString)
+	checkErr(err)
+	stmt, err := db.Prepare("insert into playlists values (?, ?)")
+	checkErr(err)
+	_, err = stmt.Exec(playlist.Id, playlist.Name)
+	checkErr(err)
+	db.Close()
+	return playlist.Id
+}
+
 //User Table
 func GetLogin(userLogin LoginObject) LoginObject {
 	db, err := sql.Open("mysql", dbString)
@@ -103,10 +116,11 @@ func checkErr(err error) {
 		panic(err)
 	}
 }
-func getNextSongId() string {
+func getNextId(table string) string {
+	queryString := "select id from " + table + " order by id desc limit 1"
 	db, err := sql.Open("mysql", dbString)
 	checkErr(err)
-	rows, err := db.Query("select id from songs order by id desc limit 1")
+	rows, err := db.Query(queryString)
 	checkErr(err)
 	var id string
 	for rows.Next() {
