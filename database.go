@@ -106,6 +106,17 @@ func DeletePlaylist(playlist PlaylistObject) {
 	db.Close()
 }
 
+//Update
+func UpdatePlaylist(playlist PlaylistObject) {
+	db, err := sql.Open("mysql", dbString)
+	checkErr(err)
+	stmt, err := db.Prepare("update playlists set name = ? where id = ?")
+	checkErr(err)
+	_, err = stmt.Exec(playlist.Name, playlist.Id)
+	checkErr(err)
+	db.Close()
+}
+
 /**
  * PlaylistSongs Table
  */

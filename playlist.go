@@ -56,7 +56,16 @@ func CreatePlaylist(w http.ResponseWriter, _ *http.Request) {
 }
 
 func EditPlaylist(w http.ResponseWriter, r *http.Request) {
-
+	//Fake name
+	newName := "New playlist name"
+	vars := mux.Vars(r)
+	playlist := PlaylistObject{
+		Id:   vars["playlistId"],
+		Name: newName,
+	}
+	UpdatePlaylist(playlist)
+	//Show all playlists
+	GetPlaylist(w, r)
 }
 func RemovePlaylist(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
