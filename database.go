@@ -53,6 +53,35 @@ func InsertSong(song SongObject) string {
 	return song.Id
 }
 
+//Update
+func UpdateSong(song SongObject) int64 {
+	db, err := sql.Open("mysql", dbString)
+	checkErr(err)
+	stmt, err := db.Prepare("update songs set name = ?, artist = ?, " +
+		"length = ?, location = ? where id = ? ")
+	checkErr(err)
+	result, err := stmt.Exec(song.Name, song.Artist, song.Length,
+		song.Location, song.Id)
+	checkErr(err)
+	db.Close()
+	rowsAffected, err := result.RowsAffected()
+	return rowsAffected
+}
+
+//Delete
+func DeleteSong(song SongObject) int64 {
+	db, err := sql.Open("mysql", dbString)
+	checkErr(err)
+	stmt, err := db.Prepare("delete from songs where " +
+		"id = ?")
+	checkErr(err)
+	result, err := stmt.Exec(song.Id)
+	checkErr(err)
+	db.Close()
+	rowsAffected, err := result.RowsAffected()
+	return rowsAffected
+}
+
 /**
  * Playlists table
  */
@@ -168,6 +197,18 @@ func DeleteAllSongsInPlaylist(playlist PlaylistObject) {
 	_, err = stmt.Exec(playlist.Id)
 	checkErr(err)
 	db.Close()
+}
+func DeleteSongFromAllPlaylists(song SongObject) int64 {
+	db, err := sql.Open("mysql", dbString)
+	checkErr(err)
+	stmt, err := db.Prepare("delete from playlistSongs where " +
+		"songId = ?")
+	checkErr(err)
+	result, err := stmt.Exec(song.Id)
+	checkErr(err)
+	db.Close()
+	rowsAffected, err := result.RowsAffected()
+	return rowsAffected
 }
 
 /**

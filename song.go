@@ -70,3 +70,31 @@ func UploadSong(w http.ResponseWriter, _ *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(song)
 }
+func EditSong(w http.ResponseWriter, r *http.Request) {
+	//Fake song
+	song := SongObject{
+		Name:     "New song name",
+		Location: "song/Newsong.mp3",
+		Length:   "3 Min",
+		Artist:   "Stephen",
+	}
+	vars := mux.Vars(r)
+	song.Id = vars["songId"]
+	rowsAffected := UpdateSong(song)
+	if rowsAffected == 1 {
+		GetSong(w, r)
+	}
+}
+func RemoveSong(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	song := SongObject{
+		Id: vars["songId"],
+	}
+	//Remove song from playlists
+	DeleteSongFromAllPlaylists(song)
+	//Remove playlist
+	rowsAffected := DeleteSong(song)
+	if rowsAffected == 1 {
+		GetSongs(w, r)
+	}
+}

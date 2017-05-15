@@ -25,6 +25,16 @@ func main() {
 		Path("/songs").
 		Name("UploadSong").
 		Handler(http.HandlerFunc(UploadSong))
+	//Edit song
+	router.Methods("PUT").
+		Path("/songs/{songId}").
+		Name("EditSong").
+		Handler(http.HandlerFunc(EditSong))
+	//Delete song
+	router.Methods("DELETE").
+		Path("/songs/{songId}").
+		Name("DelteSong").
+		Handler(http.HandlerFunc(RemoveSong))
 	router.HandleFunc("/songs", GetSongs)
 	router.HandleFunc("/songs/{songId}", GetSong)
 	router.HandleFunc("/songs/{songId}/play", PlaySong)

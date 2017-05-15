@@ -33,7 +33,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	http.ServeFile(w, r, "./web/login.html")
 }
 func LogoutSubmit(w http.ResponseWriter, r *http.Request) {
-
+	//Remove session
 }
 func LoginSubmit(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
