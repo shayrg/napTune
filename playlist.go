@@ -14,7 +14,6 @@ type PlaylistObject struct {
 }
 type PlaylistsObject []PlaylistObject
 
-//Functions
 func buildPlaylistsObject(rows *sql.Rows) PlaylistsObject {
 	var playlists PlaylistsObject
 	for rows.Next() {
@@ -49,12 +48,11 @@ func CreatePlaylist(w http.ResponseWriter, _ *http.Request) {
 	playlist := PlaylistObject{
 		Name: "New playlist",
 	}
-	playlist.Id = InsertPlaylist(playlist)
+	playlists := InsertPlaylist(playlist)
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(playlist)
+	json.NewEncoder(w).Encode(playlists)
 }
-
 func EditPlaylist(w http.ResponseWriter, r *http.Request) {
 	//Fake name
 	newName := "New playlist name"
@@ -63,9 +61,11 @@ func EditPlaylist(w http.ResponseWriter, r *http.Request) {
 		Id:   vars["playlistId"],
 		Name: newName,
 	}
-	UpdatePlaylist(playlist)
+	rowsAffected := UpdatePlaylist(playlist)
 	//Show all playlists
-	GetPlaylist(w, r)
+	if rowsAffected >= 1 {
+		GetPlaylist(w, r)
+	}
 }
 func RemovePlaylist(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
@@ -73,9 +73,11 @@ func RemovePlaylist(w http.ResponseWriter, r *http.Request) {
 		Id: vars["playlistId"],
 	}
 	//Delete all songs from playlist
-	DeleteAllSongsInPlaylist(playlist)
+	rowsAffected := DeleteAllSongsInPlaylist(playlist)
 	//Delete playlist
-	DeletePlaylist(playlist)
+	rowsAffected = DeletePlaylist(playlist)
 	//Show all playlists
-	GetPlaylists(w, r)
+	if rowsAffected >= 1 {
+		GetPlaylists(w, r)
+	}
 }

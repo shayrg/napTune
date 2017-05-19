@@ -16,7 +16,6 @@ type SongObject struct {
 }
 type SongsObject []SongObject
 
-//Functions
 func buildSongsObject(rows *sql.Rows) SongsObject {
 	var songs SongsObject
 	for rows.Next() {
@@ -65,10 +64,10 @@ func UploadSong(w http.ResponseWriter, _ *http.Request) {
 		Length:   "2 min",
 		Location: "No location",
 	}
-	song.Id = InsertSong(song)
+	songs := InsertSong(song)
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(song)
+	json.NewEncoder(w).Encode(songs)
 }
 func EditSong(w http.ResponseWriter, r *http.Request) {
 	//Fake song
@@ -81,7 +80,7 @@ func EditSong(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	song.Id = vars["songId"]
 	rowsAffected := UpdateSong(song)
-	if rowsAffected == 1 {
+	if rowsAffected >= 1 {
 		GetSong(w, r)
 	}
 }
@@ -91,10 +90,10 @@ func RemoveSong(w http.ResponseWriter, r *http.Request) {
 		Id: vars["songId"],
 	}
 	//Remove song from playlists
-	DeleteSongFromAllPlaylists(song)
+	rowsAffected := DeleteSongFromAllPlaylists(song)
 	//Remove playlist
-	rowsAffected := DeleteSong(song)
-	if rowsAffected == 1 {
+	rowsAffected = DeleteSong(song)
+	if rowsAffected >= 1 {
 		GetSongs(w, r)
 	}
 }

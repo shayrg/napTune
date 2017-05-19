@@ -11,7 +11,7 @@ const dbString string = "root:@tcp(localhost:3306)" +
 	"/napTune?charset=utf8"
 
 /**
- * Songs table
+ *Songs table
  */
 //Get All
 func GetAllSongs() SongsObject {
@@ -40,7 +40,7 @@ func GetSongById(songId string) SongsObject {
 }
 
 //Insert
-func InsertSong(song SongObject) string {
+func InsertSong(song SongObject) SongsObject {
 	song.Id = getNextId("songs")
 	db, err := sql.Open("mysql", dbString)
 	checkErr(err)
@@ -50,7 +50,9 @@ func InsertSong(song SongObject) string {
 		song.Location)
 	checkErr(err)
 	db.Close()
-	return song.Id
+	var songs SongsObject
+	songs = append(songs, song)
+	return songs
 }
 
 //Update
@@ -83,7 +85,7 @@ func DeleteSong(song SongObject) int64 {
 }
 
 /**
- * Playlists table
+ *Playlists table
  */
 //Get All
 func GetAllPlaylists() PlaylistsObject {
@@ -112,7 +114,7 @@ func GetPlaylistById(playlistId string) PlaylistsObject {
 }
 
 //Insert
-func InsertPlaylist(playlist PlaylistObject) string {
+func InsertPlaylist(playlist PlaylistObject) PlaylistsObject {
 	playlist.Id = getNextId("playlists")
 	db, err := sql.Open("mysql", dbString)
 	checkErr(err)
@@ -121,36 +123,42 @@ func InsertPlaylist(playlist PlaylistObject) string {
 	_, err = stmt.Exec(playlist.Id, playlist.Name)
 	checkErr(err)
 	db.Close()
-	return playlist.Id
-}
-
-//Delete
-func DeletePlaylist(playlist PlaylistObject) {
-	db, err := sql.Open("mysql", dbString)
-	checkErr(err)
-	stmt, err := db.Prepare("delete from playlists where id = ?")
-	checkErr(err)
-	_, err = stmt.Exec(playlist.Id)
-	checkErr(err)
-	db.Close()
+	var playlists PlaylistsObject
+	playlists = append(playlists, playlist)
+	return playlists
 }
 
 //Update
-func UpdatePlaylist(playlist PlaylistObject) {
+func UpdatePlaylist(playlist PlaylistObject) int64 {
 	db, err := sql.Open("mysql", dbString)
 	checkErr(err)
 	stmt, err := db.Prepare("update playlists set name = ? where id = ?")
 	checkErr(err)
-	_, err = stmt.Exec(playlist.Name, playlist.Id)
+	result, err := stmt.Exec(playlist.Name, playlist.Id)
 	checkErr(err)
 	db.Close()
+	rowsAffected, err := result.RowsAffected()
+	return rowsAffected
+}
+
+//Delete
+func DeletePlaylist(playlist PlaylistObject) int64 {
+	db, err := sql.Open("mysql", dbString)
+	checkErr(err)
+	stmt, err := db.Prepare("delete from playlists where id = ?")
+	checkErr(err)
+	result, err := stmt.Exec(playlist.Id)
+	checkErr(err)
+	db.Close()
+	rowsAffected, err := result.RowsAffected()
+	return rowsAffected
 }
 
 /**
- * PlaylistSongs Table
+ *PlaylistSongs Table
  */
-//Get
-func GetPlaylistSongsById(playlistId string) SongsObject {
+//Get all in playlist
+func GetPlaylistSongsByPlaylistId(playlistId string) SongsObject {
 	db, err := sql.Open("mysql", dbString)
 	checkErr(err)
 	stmt, err := db.Prepare("select songs.id, songs.name, artist, length, location from songs join playlistSongs on songs.id = songId join playlists on playlists.id = playlistId where playlistId = ?")
@@ -163,8 +171,22 @@ func GetPlaylistSongsById(playlistId string) SongsObject {
 	return songs
 }
 
+//Get
+func GetPlaylistSongsById(playlistSong PlaylistSongObject) PlaylistSongsObject {
+	db, err := sql.Open("mysql", dbString)
+	checkErr(err)
+	stmt, err := db.Prepare("select * from playlistSongs where songId = ?" +
+		" and playlistId = ?")
+	checkErr(err)
+	rows, err := stmt.Query(playlistSong.SongId, playlistSong.PlaylistId)
+	checkErr(err)
+	db.Close()
+	playlistSongs := buildPlaylistSongsObject(rows)
+	return playlistSongs
+}
+
 //Insert
-func InsertSongInPlaylist(playlistSong PlaylistSongObject) string {
+func InsertSongInPlaylist(playlistSong PlaylistSongObject) PlaylistSongsObject {
 	playlistSong.SongOrder = getNextPlaylistOrder(playlistSong.PlaylistId)
 	db, err := sql.Open("mysql", dbString)
 	checkErr(err)
@@ -174,29 +196,50 @@ func InsertSongInPlaylist(playlistSong PlaylistSongObject) string {
 		playlistSong.SongOrder)
 	checkErr(err)
 	db.Close()
-	return playlistSong.SongOrder
+	var playlistSongs PlaylistSongsObject
+	playlistSongs = append(playlistSongs, playlistSong)
+	return playlistSongs
+}
+
+//Update
+func UpdateSongInPlaylist(playlistSong PlaylistSongObject) int64 {
+	db, err := sql.Open("mysql", dbString)
+	checkErr(err)
+	stmt, err := db.Prepare("update playlistSongs set songOrder = ? where" +
+		" songId = ? and playlistId = ?")
+	checkErr(err)
+	result, err := stmt.Exec(playlistSong.SongOrder, playlistSong.SongId,
+		playlistSong.PlaylistId)
+	checkErr(err)
+	db.Close()
+	rowsAffected, err := result.RowsAffected()
+	return rowsAffected
 }
 
 //Delete
-func DeleteSongInPlaylist(playlistSong PlaylistSongObject) {
+func DeleteSongInPlaylist(playlistSong PlaylistSongObject) int64 {
 	db, err := sql.Open("mysql", dbString)
 	checkErr(err)
 	stmt, err := db.Prepare("delete from playlistSongs where " +
 		"playlistId = ? and songId = ?")
 	checkErr(err)
-	_, err = stmt.Exec(playlistSong.PlaylistId, playlistSong.SongId)
+	result, err := stmt.Exec(playlistSong.PlaylistId, playlistSong.SongId)
 	checkErr(err)
 	db.Close()
+	rowsAffected, err := result.RowsAffected()
+	return rowsAffected
 }
-func DeleteAllSongsInPlaylist(playlist PlaylistObject) {
+func DeleteAllSongsInPlaylist(playlist PlaylistObject) int64 {
 	db, err := sql.Open("mysql", dbString)
 	checkErr(err)
 	stmt, err := db.Prepare("delete from playlistSongs where " +
 		"playlistId = ?")
 	checkErr(err)
-	_, err = stmt.Exec(playlist.Id)
+	result, err := stmt.Exec(playlist.Id)
 	checkErr(err)
 	db.Close()
+	rowsAffected, err := result.RowsAffected()
+	return rowsAffected
 }
 func DeleteSongFromAllPlaylists(song SongObject) int64 {
 	db, err := sql.Open("mysql", dbString)
@@ -212,7 +255,7 @@ func DeleteSongFromAllPlaylists(song SongObject) int64 {
 }
 
 /**
- * User Table
+ *User Table
  */
 //Get
 func GetLogin(userLogin LoginObject) LoginObject {
@@ -228,7 +271,7 @@ func GetLogin(userLogin LoginObject) LoginObject {
 }
 
 /**
- * Helper functions
+ *Helper functions
  */
 func checkErr(err error) {
 	if err != nil {
