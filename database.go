@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
+	"math/rand"
 	"strconv"
 )
 
@@ -261,13 +262,43 @@ func DeleteSongFromAllPlaylists(song SongObject) int64 {
 func GetLogin(userLogin LoginObject) LoginObject {
 	db, err := sql.Open("mysql", dbString)
 	checkErr(err)
-	stmt, err := db.Prepare("select email, password from users where email = ?")
+	stmt, err := db.Prepare("select email, password, sessionId from users" +
+		" where email = ?")
 	checkErr(err)
 	rows, err := stmt.Query(userLogin.Email)
 	checkErr(err)
 	login := buildLogin(rows)
 	db.Close()
 	return login
+}
+func SetSessionId(login LoginObject) string {
+	string :=
+		"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890"
+	stringLength := 32
+	sessionId := make([]byte, stringLength)
+	for i := range sessionId {
+		sessionId[i] = string[rand.Intn(len(string))]
+	}
+	sessionIdString := fmt.Sprintf("%x", sessionId)
+	db, err := sql.Open("mysql", dbString)
+	checkErr(err)
+	stmt, err := db.Prepare("update users set sessionId = ? where " +
+		"email = ? and password = ?")
+	checkErr(err)
+	_, err = stmt.Exec(sessionIdString, login.Email, login.Password)
+	checkErr(err)
+	db.Close()
+	return sessionIdString
+}
+func ClearSessionId(sessionId string) {
+	db, err := sql.Open("mysql", dbString)
+	checkErr(err)
+	stmt, err := db.Prepare("update users set sessionId = '' where " +
+		"sessionId = ?")
+	checkErr(err)
+	_, err = stmt.Exec(sessionId)
+	checkErr(err)
+	db.Close()
 }
 
 /**

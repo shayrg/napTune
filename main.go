@@ -11,17 +11,6 @@ func main() {
 	//Make router
 	router := mux.NewRouter().StrictSlash(true)
 	/**
-	 *Assets
-	 */
-	//Serve Index
-	router.HandleFunc("/", Index)
-	//Serve Login
-	router.HandleFunc("/login", Login)
-	//Serve Style
-	router.HandleFunc("/getstyle", GetStyle)
-	//Serve Script
-	router.HandleFunc("/getscript", GetScript)
-	/**
 	 *Users
 	 */
 	//Login
@@ -100,6 +89,17 @@ func main() {
 	//Get playlistSong by id
 	router.HandleFunc("/playlists/{playlistId}/songs/{songId}",
 		GetPlaylistSong)
+	/**
+	 *Assets
+	 */
+	//Serve Index
+	router.HandleFunc("/", Index)
+	//Serve Login
+	router.HandleFunc("/login", Login)
+	//Serve Style
+	router.HandleFunc("/getstyle", GetStyle)
+	//Serve Script
+	router.HandleFunc("/getscript", GetScript)
 	//Listen and serve
 	port := "8080"
 	fmt.Println("Listening on port: " + port)

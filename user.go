@@ -3,12 +3,14 @@ package main
 import (
 	"database/sql"
 	"encoding/json"
+	"github.com/gorilla/sessions"
 	"net/http"
 )
 
 type LoginObject struct {
-	Email    string
-	Password string
+	Email     string
+	Password  string
+	SessionId string
 }
 type LoginResponse struct {
 	LoginStatus int    `json:"loginstatus"`
@@ -20,20 +22,53 @@ func buildLogin(rows *sql.Rows) LoginObject {
 	for rows.Next() {
 		var email string
 		var password string
-		err := rows.Scan(&email, &password)
+		var sessionId string
+		err := rows.Scan(&email, &password, &sessionId)
 		checkErr(err)
 		login = LoginObject{
-			Email:    email,
-			Password: password,
+			Email:     email,
+			Password:  password,
+			SessionId: sessionId,
 		}
 	}
 	return login
 }
 func Login(w http.ResponseWriter, r *http.Request) {
-	http.ServeFile(w, r, "./web/login.html")
+	//Check login cookie
+	storeAssets := sessions.NewCookieStore([]byte("napTune_login_session"))
+	session, err := storeAssets.Get(r, "login")
+	checkErr(err)
+	sessionId := session.Values["sessionId"]
+	userName := session.Values["userName"]
+	if sessionId != nil && userName != nil {
+		if userName.(string) != "" && sessionId.(string) != "" {
+			//Check session and username
+			loginObject := GetLogin(LoginObject{Email: userName.(string)})
+			if sessionId == loginObject.SessionId {
+				http.Redirect(w, r, "/", 301)
+			} else {
+				http.ServeFile(w, r, "./web/login.html")
+			}
+		} else {
+			http.ServeFile(w, r, "./web/login.html")
+		}
+	} else {
+		http.ServeFile(w, r, "./web/login.html")
+	}
 }
 func LogoutSubmit(w http.ResponseWriter, r *http.Request) {
-	//Remove session
+	var store = sessions.NewCookieStore([]byte("napTune_login_session"))
+	session, err := store.Get(r, "login")
+	checkErr(err)
+	//clear database session
+	if session.Values["sessionId"] != nil {
+		ClearSessionId(session.Values["sessionId"].(string))
+	}
+	//Set cookie
+	session.Values["sessionId"] = ""
+	session.Values["userName"] = ""
+	session.Save(r, w)
+	http.ServeFile(w, r, "./web/login.html")
 }
 func LoginSubmit(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
@@ -68,9 +103,16 @@ func LoginSubmit(w http.ResponseWriter, r *http.Request) {
 	}
 	//Return Response
 	if response.LoginStatus == http.StatusOK {
+		//Set database session
+		sessionId := SetSessionId(userLogin)
 		//Set cookie
-		//Index()
-		http.ServeFile(w, r, "./web/index.html")
+		var store = sessions.NewCookieStore([]byte("napTune_login_session"))
+		session, err := store.Get(r, "login")
+		checkErr(err)
+		session.Values["sessionId"] = sessionId
+		session.Values["userName"] = userLogin.Email
+		session.Save(r, w)
+		http.Redirect(w, r, "/", 301)
 	} else {
 		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 		w.WriteHeader(response.LoginStatus)
