@@ -3,6 +3,7 @@ package main
 import (
 	"database/sql"
 	"encoding/json"
+	"fmt"
 	"github.com/gorilla/sessions"
 	"net/http"
 )
@@ -32,6 +33,9 @@ func buildLogin(rows *sql.Rows) LoginObject {
 		}
 	}
 	return login
+}
+func Logout(w http.ResponseWriter, r *http.Request) {
+	http.ServeFile(w, r, "./web/logout.html")
 }
 func Login(w http.ResponseWriter, r *http.Request) {
 	//Check login cookie
@@ -68,6 +72,7 @@ func LogoutSubmit(w http.ResponseWriter, r *http.Request) {
 	session.Values["sessionId"] = ""
 	session.Values["userName"] = ""
 	session.Save(r, w)
+	fmt.Println("logout submited")
 	http.ServeFile(w, r, "./web/login.html")
 }
 func LoginSubmit(w http.ResponseWriter, r *http.Request) {

@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"github.com/gorilla/sessions"
 	"net/http"
 )
@@ -13,10 +12,10 @@ func Index(w http.ResponseWriter, r *http.Request) {
 	checkErr(err)
 	sessionId := session.Values["sessionId"]
 	userName := session.Values["userName"]
-	fmt.Println("SesionId")
+	/*fmt.Println("SesionId")
 	fmt.Println(sessionId)
 	fmt.Println("username")
-	fmt.Println(userName)
+	fmt.Println(userName)*/
 	if sessionId != nil && userName != nil {
 		if userName.(string) != "" && sessionId.(string) != "" {
 			//Check session and username

@@ -19,7 +19,10 @@ func main() {
 		Name("submitLogin").
 		Handler(http.HandlerFunc(LoginSubmit))
 	//Logout
-	router.HandleFunc("/logout", LogoutSubmit)
+	router.Methods("POST").
+		Path("/logout").
+		Name("submitLogout").
+		Handler(http.HandlerFunc(LogoutSubmit))
 	/**
 	 *Songs
 	 */
@@ -96,6 +99,7 @@ func main() {
 	router.HandleFunc("/", Index)
 	//Serve Login
 	router.HandleFunc("/login", Login)
+	router.HandleFunc("/logout", Logout)
 	//Serve Style
 	router.HandleFunc("/getstyle", GetStyle)
 	//Serve Script
